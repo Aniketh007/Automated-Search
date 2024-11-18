@@ -57,16 +57,27 @@ if fil:
             set_api(google_api, openai_api)
             st.success("API keys set successfully!")
             query = st.text_input("Provide the query to search about",
-                                value="Find the latest news about {value}")
+                                value="Find the email address of {value}")
+            check=st.checkbox("Do you wish to provide the prompt?")
+            if check:
+                prompt=st.text_input("Enter the Prompt")
             if query:
                 col = st.selectbox("Select the column to search", df.columns)
                 if st.button("Run"):
                     with st.spinner('Processing...'):
                         results = []
+                        
                         for entity in df[col]:
                             query_temp = query.format(value=entity)
                             snippets = search_web(query_temp)
-                            summary = summarize(snippets)
+                            llm_prompt = f"""
+                                You are an AI assistant. A user asked the query: "{query_temp}".
+                                The following text was retrieved from the web:
+                                {snippets}
+
+                                Based on the query, summarize the most relevant information from the web text in one concise sentence.
+                                """
+                            summary = summarize(llm_prompt)
                             results.append({"Entity":entity, "Summary": summary})
                         results_df = pd.DataFrame(results)
                         st.write("Search Results:")

@@ -28,7 +28,7 @@ def search_web(query: str) -> list:
                 snippets.append(result['snippet'])
     return ''.join(snippets)
 
-def summarize(text):
+def summarize(llm_prompt):
     if "OPENAI_API_KEY" not in os.environ or not os.environ["OPENAI_API_KEY"]:
         raise ValueError("OpenAI API key is not set.")
 
@@ -39,10 +39,14 @@ def summarize(text):
         timeout=None,
         max_retries=2
     )
+
     message = [
-        {"role": "system", "content": "You are a helpful assistant that summarizes the text into a single sentence."},
-        {"role": "user", "content": text}
+        {"role": "user", "content": llm_prompt}
     ]
 
-    ai_msg = llm.invoke(message)
-    return ai_msg.content
+    try:
+        ai_msg = llm.invoke(message)
+        return ai_msg.content.strip()
+    except Exception as e:
+        return f"An error occurred during summarization: {str(e)}"
+
