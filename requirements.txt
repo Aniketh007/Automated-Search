@@ -1,5 +1,5 @@
-streamlit
-pandas
-serpapi
-langchain_openai
-openai
+streamlit==1.40.1
+pandas==2.2.3
+serpapi==2.0.8
+langchain_openai==0.1.4
+openai==0.27.0
